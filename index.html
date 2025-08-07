@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบทดสอบจำลองสอบใบอนุญาตตัวแทนประกันชีวิต (คปภ.)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .header {
+            background-color: #004d99;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .start-page {
+            text-align: center;
+            padding: 40px;
+        }
+        .start-page h2 {
+            color: #004d99;
+        }
+        .start-page ul {
+            text-align: left;
+            margin: 20px auto;
+            max-width: 600px;
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .start-page li {
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            border-radius: 4px;
+        }
+        .start-page label {
+            display: block;
+            margin: 10px 0;
+            padding: 12px;
+            background-color: #e9ecef;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .start-page label:hover {
+            background-color: #d8d8d8;
+        }
+        .start-page input[type="radio"]:checked + label {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .start-button {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: white;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        .start-button:hover {
+            background-color: #218838;
+        }
+        .quiz-page {
+            display: none;
+        }
+        .timer-container {
+            text-align: right;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #d9534f;
+        }
+        .section-nav {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .section-nav button {
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            transition: background-color 0.3s;
+        }
+        .section-nav button.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .section-nav button:hover:not(.active) {
+            background-color: #e2e6ea;
+        }
+        .question-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .question-nav button {
+            background-color: #e9ecef;
+            border: 1px solid #ccc;
+            padding: 8px 12px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            min-width: 40px;
+            transition: background-color 0.3s;
+        }
+        .question-nav button.current {
+            background-color: #007bff;
+            color: white;
+        }
+        .question-nav button:hover:not(.current) {
+            background-color: #d8d8d8;
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-left: 5px solid #007bff;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .options label {
+            display: block;
+            margin: 10px 0;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .options label:hover {
+            background-color: #e9ecef;
+        }
+        .quiz-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .quiz-controls button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            border: none;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .quiz-controls button.nav-button {
+            background-color: #6c757d;
+        }
+        .quiz-controls button.nav-button:hover {
+            background-color: #5a6268;
+        }
+        #submit-button {
+            background-color: #28a745;
+            display: block;
+            margin: 20px auto;
+        }
+        #submit-button:hover {
+            background-color: #218838;
+        }
+        #result {
+            display: none;
+            margin-top: 30px;
+            font-size: 1.5em;
+            text-align: center;
+        }
+        #answer-key {
+            display: none;
+            margin-top: 30px;
+            text-align: left;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        .answer-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        .answer-item .question-text {
+            font-weight: bold;
+        }
+        .answer-item .correct-answer {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .answer-item .user-answer {
+            color: #d9534f;
+            font-style: italic;
+        }
+        
+        .calculator-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .calculator-button-toggle {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #ffc107;
+            color: #333;
+            transition: background-color 0.3s;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .calculator-button-toggle:hover {
+            background-color: #e0a800;
+        }
+        .calculator {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 250px;
+            display: none;
+        }
+        .calc-display {
+            background-color: #e9ecef;
+            color: #333;
+            font-size: 2em;
+            text-align: right;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+        .calc-buttons button {
+            font-size: 1.2em;
+            padding: 15px;
+            background-color: #dee2e6;
+            border: none;
+            border-radius: 5px;
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .calc-buttons button:hover {
+            background-color: #c6c6c6;
+        }
+        .calc-buttons .operator {
+            background-color: #007bff;
+            color: white;
+        }
+        .calc-buttons .operator:hover {
+            background-color: #0056b3;
+        }
+        .calc-buttons .equal {
+            background-color: #28a745;
+            color: white;
+            grid-column: span 2;
+        }
+        .calc-buttons .equal:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>แบบทดสอบจำลองใบอนุญาตตัวแทนประกันชีวิต</h1>
+    <h3>สำนักงานคณะกรรมการกำกับและส่งเสริมการประกอบธุรกิจประกันภัย (คปภ.)</h3>
+	<h4>จัดทำดดย นายสุภร อนุสุริยา(ลำเต้ย)เลขาฝ่ายฯ4
+</div>
+
+<div class="container">
+    <div id="start-page" class="start-page">
+        <h2>ข้อกำหนดและคำแนะนำในการสอบ</h2>
+        <form id="modeSelectionForm" style="text-align: left; max-width: 600px; margin: auto;">
+            <h3>เลือกรูปแบบการสอบ:</h3>
+            <input type="radio" id="mode1" name="exam_mode" value="timed" checked style="display:none;">
+            <label for="mode1">
+                ระบบตรวจวัดผลสอบแบบเสมือนจริง(จับเวลา120นาที,เฉลยทั้งหมดเมื่อสอบเสร็จ)
+            </label>
+            <input type="radio" id="mode2" name="exam_mode" value="step_by_step" style="display:none;">
+            <label for="mode2">
+                ระบบทำและเฉลยไปทีละข้อ(ไม่จับเวลา,แสดงเฉลยทันทีเมื่อตอบแต่ละข้อ)
+            </label>
+            <input type="radio" id="mode3" name="exam_mode" value="untimed" style="display:none;">
+            <label for="mode3">
+                ระบบตรวจวัดผลสอบแบบเสมือนจริง(ไม่จับเวลา,เฉลยทั้งหมดเมื่อสอบเสร็จ)
+            </label>
+        </form>
+        
+        <br>
+        <ul>
+     
+       <h5>
+	  <h3>การทำข้อสอบ:<h5>
+    <h5>ข้อสอบจะแสดงทีละข้อ โดยผู้เข้าสอบสามารถ click ที่หน้าตัวเลือกที่ต้องการเลือกเป็นคำตอบได้<h5>
+    <h5>สามารถใช้ปุ่ม"ข้อถัดไป"และ"ข้อก่อนหน้า"เพื่อเปลี่ยนข้อ<h5>
+    <h5>สามารถ click ที่เลขที่ของข้อสอบที่ต้องการบนแถบกระดาษคำตอบด้านล่างเพื่อไปยังข้อนั้นๆ ได้<h5>
+           <h5>
+           <h3>การทุจริต:<h3>
+	<h5>ห้ามมิให้ผู้เข้าสอบกระทำการใดๆนอกเหนือจากที่กำหนดไว้(เช่นการใช้rightclick,การเปิดโปรแกรมอื่น)<h5>
+	<h5>หากระบบตรวจพบการกระทำเกินกว่าที่ตั้งไว้จะถือว่าทุจริตและปรับให้สอบไม่ผ่านทันที<h5>
+		<h5>
+	<h5>การสอบถาม:หากมีข้อสงสัยใดๆในระหว่างการสอบให้ยกมือเพื่อขอสอบถามจากเจ้าหน้าที่คุมสอบเท่านั้น<h5>
+	<h5>เริ่มทำการสอบ:หากผู้เข้าสอบยินยอมรับข้อกำหนดและต้องการเริ่มสอบให้clickที่ปุ่ม"เริ่มทำการสอบ"<h5>
+        </ul>
+        <button class="start-button" onclick="startQuiz()">เริ่มทำการสอบ</button>
+		</ul>
+		<h4>*** หมายเหตุ : ระบบนี้เป็นเพียงตัวอย่างแสดงหน้าจอการสอบ และข้อสอบที่นำมาใช้เป็นเพียงตัวอย่างเท่านั้น ***<h4>
+    </div>
+
+    <div id="quiz-page" class="quiz-page">
+        <div class="timer-container">
+            เวลาที่เหลือ: <span id="timer"></span>
+        </div>
+
+        <div class="section-nav" id="section-nav">
+            <button class="active" onclick="showSection(0)">จรรยาบรรณ (15 ข้อ)</button>
+            <button onclick="showSection(1)">ความรู้ทั่วไป (25 ข้อ)</button>
+            <button onclick="showSection(2)">กฎหมาย (20 ข้อ)</button>
+        </div>
+        
+        <div class="question-nav" id="question-nav"></div>
+
+        <form id="quizForm"></form>
+
+        <div class="quiz-controls">
+            <button id="prev-button" class="nav-button">ข้อก่อนหน้า</button>
+            <button id="next-button" class="nav-button">ข้อถัดไป</button>
+        </div>
+        <br>
+        <button id="submit-button" onclick="submitQuiz()">ส่งคำตอบ</button>
+        
+        <div id="result" style="display:none; margin-top: 30px; font-size: 1.5em; text-align: center;"></div>
+        <div id="answer-key" style="display:none;"></div>
+    </div>
+</div>
+
+<div class="calculator-container">
+    <button class="calculator-button-toggle" onclick="toggleCalculator()">เครื่องคิดเลข</button>
+    <div id="calculator" class="calculator">
+        <div class="calc-display" id="calc-display">0</div>
+        <div class="calc-buttons">
+            <button onclick="clearDisplay()">C</button>
+            <button onclick="deleteLast()">DEL</button>
+            <button class="operator" onclick="appendOperator('%')">%</button>
+            <button class="operator" onclick="appendOperator('/')">/</button>
+            <button onclick="appendNumber('7')">7</button>
+            <button onclick="appendNumber('8')">8</button>
+            <button onclick="appendNumber('9')">9</button>
+            <button class="operator" onclick="appendOperator('*')">*</button>
+            <button onclick="appendNumber('4')">4</button>
+            <button onclick="appendNumber('5')">5</button>
+            <button onclick="appendNumber('6')">6</button>
+            <button class="operator" onclick="appendOperator('-')">-</button>
+            <button onclick="appendNumber('1')">1</button>
+            <button onclick="appendNumber('2')">2</button>
+            <button onclick="appendNumber('3')">3</button>
+            <button class="operator" onclick="appendOperator('+')">+</button>
+            <button onclick="appendNumber('0')">0</button>
+            <button onclick="appendNumber('.')">.</button>
+            <button class="operator equal" onclick="calculateResult()">=</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // คลังคำถามขนาดใหญ่
+    const questionBank = [
+        // หมวดที่ 1: จรรยาบรรณและศีลธรรมของตัวแทน (คลัง 50 ข้อ)
+        { question: "1. การปฏิบัติหน้าที่ด้วยความซื่อสัตย์สุจริตต่อผู้เอาประกันภัยและบริษัท หมายถึงข้อใด?", options: ["นำเบี้ยประกันไปใช้ส่วนตัว", "ไม่เปิดเผยข้อมูลส่วนตัวลูกค้า", "เสนอขายประกันที่ตรงกับความต้องการของลูกค้า", "ปลอมแปลงเอกสาร"], answer: 2, section: 0 },
+        { question: "2. ข้อใดถือว่าเป็นการละเมิดจรรยาบรรณของตัวแทน?", options: ["แจ้งลูกค้าถึงผลประโยชน์ตามกรมธรรม์", "เปรียบเทียบข้อดีข้อเสียของบริษัทอื่นในทางเสียหาย", "ช่วยเหลือลูกค้าในการเรียกร้องสินไหม", "ให้ข้อมูลที่ถูกต้องแก่ลูกค้า"], answer: 1, section: 0 },
+        { question: "3. ตัวแทนต้องรักษาความลับของลูกค้าตามข้อใด?", options: ["กฎหมายลิขสิทธิ์", "กฎหมายอาญา", "กฎหมายคุ้มครองข้อมูลส่วนบุคคล", "กฎหมายแพ่งและพาณิชย์"], answer: 2, section: 0 },
+        { question: "4. หากตัวแทนรับเบี้ยประกันภัยจากผู้เอาประกันภัยแล้ว ต้องออกหลักฐานการรับเงินประเภทใด?", options: ["ใบเสร็จรับเงินบริษัท", "ใบรับเงินทั่วไป", "ใบรับเงินที่เขียนเอง", "ใบนำฝากธนาคาร"], answer: 0, section: 0 },
+        { question: "5. หากตัวแทนถูกเพิกถอนใบอนุญาต เนื่องจากละเมิดจรรยาบรรณ จะสามารถขอรับใบอนุญาตใหม่ได้เมื่อใด?", options: ["ไม่มีสิทธิ์ขออีก", "เว้น 1 ปี", "เว้น 3 ปี", "เว้น 5 ปี"], answer: 2, section: 0 },
+        { question: "6. การที่ตัวแทนให้ข้อมูลผลิตภัณฑ์ประกันภัยแก่ลูกค้าไม่ครบถ้วน ถือว่าเป็นการกระทำที่ผิดต่อจรรยาบรรณข้อใด?", options: ["มีความรู้ความสามารถ", "รักษาความลับ", "ซื่อสัตย์สุจริต", "ให้ข้อมูลถูกต้อง"], answer: 3, section: 0 },
+        { question: "7. ตัวแทนมีหน้าที่ต้องส่งเบี้ยประกันภัยที่ได้รับจากลูกค้าให้แก่บริษัทภายในกี่วัน?", options: ["ภายใน 3 วันทำการ", "ภายใน 7 วันทำการ", "ภายใน 15 วันทำการ", "ภายใน 30 วันทำการ"], answer: 1, section: 0 },
+        { question: "8. ข้อใดเป็นจรรยาบรรณที่ตัวแทนต้องปฏิบัติระหว่างตนเองกับเพื่อนร่วมอาชีพ?", options: ["ไม่กล่าวหาเพื่อนร่วมอาชีพในทางเสียหาย", "ช่วยเหลือซึ่งกันและกันเสมอ", "ไม่ยุ่งเกี่ยวกับลูกค้าของเพื่อนร่วมอาชีพ", "ถูกทุกข้อ"], answer: 0, section: 0 },
+        { question: "9. ตัวแทนต้องทำอย่างไรเมื่อรับมอบกรมธรรม์จากบริษัทเพื่อส่งมอบให้ลูกค้า?", options: ["แกะดูรายละเอียดก่อนส่ง", "ส่งมอบให้ลูกค้าทันทีโดยไม่ชักช้า", "เก็บไว้จนกว่าลูกค้าจะจ่ายเบี้ยทั้งหมด", "เปิดอ่านให้ลูกค้าฟังทุกบรรทัด"], answer: 1, section: 0 },
+        { question: "10. ข้อใดคือวัตถุประสงค์หลักของจรรยาบรรณและศีลธรรมของตัวแทน?", options: ["เพื่อสร้างยอดขายให้สูงที่สุด", "เพื่อรักษาผลประโยชน์ของลูกค้าและบริษัท", "เพื่อเพิ่มโอกาสในการเลื่อนตำแหน่ง", "เพื่อลดความเสี่ยงในการถูกฟ้องร้อง"], answer: 1, section: 0 },
+        { question: "11. การให้คำแนะนำลูกค้าเกี่ยวกับผลิตภัณฑ์ประกันภัย ตัวแทนควรพิจารณาจากสิ่งใดเป็นอันดับแรก?", options: ["เบี้ยประกันภัยที่สูงที่สุด", "ผลประโยชน์ที่ลูกค้าจะได้รับ", "ความต้องการและความสามารถในการจ่ายเบี้ยของลูกค้า", "ยอดขายที่ตัวแทนจะได้รับ"], answer: 2, section: 0 },
+        { question: "12. หากลูกค้าต้องการยกเลิกสัญญาประกันชีวิต ตัวแทนควรทำอย่างไร?", options: ["ขัดขวางและโน้มน้าวไม่ให้ยกเลิก", "แจ้งให้บริษัททราบทันทีและให้ข้อมูลที่ถูกต้อง", "เสนอผลิตภัณฑ์อื่นแทน", "เก็บเรื่องไว้ก่อน"], answer: 1, section: 0 },
+        { question: "13. สิ่งใดที่ตัวแทนไม่ควรนำมาใช้เป็นเครื่องมือในการเสนอขาย?", options: ["เอกสารประกอบการขายที่บริษัทอนุมัติ", "หลักการที่ถูกต้องของ คปภ.", "การโฆษณาชวนเชื่อที่เกินจริง", "การอธิบายผลประโยชน์จากกรมธรรม์"], answer: 2, section: 0 },
+        { question: "14. หากตัวแทนกระทำผิดจรรยาบรรณและถูกพิจารณาโทษ โทษที่ได้รับอาจมีผลต่อสิ่งใด?", options: ["ใบอนุญาต", "คะแนนความประพฤติ", "เงินเดือน", "ถูกทุกข้อ"], answer: 0, section: 0 },
+        { question: "15. หน้าที่ของตัวแทนในการให้ความรู้เกี่ยวกับผลิตภัณฑ์แก่ลูกค้าคือข้อใด?", options: ["ให้ข้อมูลตามที่ลูกค้าต้องการเท่านั้น", "ให้ข้อมูลตามจริงและครบถ้วน", "ให้ข้อมูลเฉพาะส่วนที่ลูกค้าสนใจ", "ให้ข้อมูลเฉพาะผลิตภัณฑ์ของบริษัทตนเอง"], answer: 1, section: 0 },
+        { question: "16. หากตัวแทนได้รับทราบว่าลูกค้าต้องการข้อมูลเกี่ยวกับผลิตภัณฑ์ของบริษัทคู่แข่ง ควรทำอย่างไร?", options: ["ปฏิเสธที่จะให้ข้อมูล", "ให้ข้อมูลเฉพาะผลิตภัณฑ์ของบริษัทตนเอง", "ให้ข้อมูลที่ถูกต้องและครบถ้วนของบริษัทตนเองและไม่กล่าวหาบริษัทคู่แข่ง", "กล่าวหาบริษัทคู่แข่งในทางเสียหาย"], answer: 2, section: 0 },
+        { question: "17. การรักษาความลับของลูกค้าควรสิ้นสุดเมื่อใด?", options: ["เมื่อลูกค้าเสียชีวิต", "เมื่อกรมธรรม์สิ้นสุด", "เมื่อลูกค้าอนุญาตให้เปิดเผย", "ไม่มีข้อใดถูก"], answer: 2, section: 0 },
+        { question: "18. ในการเสนอขาย ตัวแทนควรตรวจสอบสิ่งใดก่อนเป็นอันดับแรก?", options: ["ยอดขายของตนเอง", "ความต้องการที่แท้จริงของลูกค้า", "เบี้ยประกันภัยที่จะได้รับ", "ผลิตภัณฑ์ที่บริษัทต้องการให้ขาย"], answer: 1, section: 0 },
+        { question: "19. หากตัวแทนถูกกล่าวหาว่ากระทำผิดจรรยาบรรณ ควรทำอย่างไร?", options: ["ปฏิเสธทุกข้อกล่าวหา", "ไม่ยอมรับการสอบสวน", "ให้ความร่วมมือในการสอบสวนและให้ข้อเท็จจริง", "ขอลาออกเพื่อหลีกเลี่ยงความผิด"], answer: 2, section: 0 },
+        { question: "20. ข้อใดคือความรับผิดชอบของตัวแทนต่อบริษัท?", options: ["ส่งเบี้ยประกันภัยที่ได้รับภายในเวลาที่กำหนด", "สร้างภาพลักษณ์ที่ดีให้บริษัท", "ไม่กล่าวหาบริษัทในทางเสียหาย", "ถูกทุกข้อ"], answer: 3, section: 0 },
+        //... เพิ่มคำถามหมวดจรรยาบรรณอีก 30 ข้อ (ตัวอย่าง)
+        { question: "21. ตัวแทนควรแนะนำให้ลูกค้าทำประกันแบบใด?", options: ["แบบที่มีค่าคอมมิชชั่นสูง", "แบบที่ตรงกับความต้องการและฐานะการเงินของลูกค้า", "แบบที่มีความคุ้มครองสูงสุด", "แบบที่เบี้ยประกันต่ำที่สุด"], answer: 1, section: 0 },
+        { question: "22. ข้อใดคือการปฏิบัติหน้าที่ด้วยความสุภาพต่อลูกค้า?", options: ["ใช้ภาษาที่สุภาพและเป็นมิตร", "บอกให้ลูกค้าซื้อประกันทันที", "ส่งมอบเอกสารอย่างเร่งรีบ", "ไม่รับฟังข้อสงสัยของลูกค้า"], answer: 0, section: 0 },
+        { question: "23. การปลอมแปลงลายเซ็นของผู้เอาประกันภัยถือว่าเป็นการกระทำที่ผิดต่อจรรยาบรรณข้อใด?", options: ["การให้ข้อมูลที่ถูกต้อง", "การรักษาความลับ", "ความซื่อสัตย์สุจริต", "การรักษาผลประโยชน์"], answer: 2, section: 0 },
+        { question: "24. หากตัวแทนรับเบี้ยประกันภัยจากลูกค้าและออกใบเสร็จรับเงินบริษัทให้ จะต้องนำเงินส่งบริษัทภายในกี่วัน?", options: ["ไม่เกิน 3 วันทำการ", "ไม่เกิน 7 วันทำการ", "ไม่เกิน 15 วันทำการ", "ไม่เกิน 30 วันทำการ"], answer: 1, section: 0 },
+        { question: "25. ข้อใดคือการรักษาภาพลักษณ์ที่ดีของอาชีพตัวแทน?", options: ["แต่งกายสุภาพเรียบร้อย", "มีทัศนคติเชิงบวก", "มีความเป็นมืออาชีพ", "ถูกทุกข้อ"], answer: 3, section: 0 },
+        { question: "26. ข้อใดไม่ถือเป็นจรรยาบรรณของตัวแทน?", options: ["มีความรู้ความสามารถ", "ซื่อสัตย์สุจริต", "กล่าวอ้างว่าตนเองมีใบอนุญาต", "รักษาความลับของลูกค้า"], answer: 2, section: 0 },
+        { question: "27. หากตัวแทนได้รับทราบว่าลูกค้ามีการเปลี่ยนแปลงข้อมูลส่วนตัว ควรทำอย่างไร?", options: ["ไม่ต้องแจ้งบริษัท", "แจ้งให้บริษัททราบทันทีเพื่อปรับปรุงข้อมูล", "เก็บข้อมูลไว้เฉยๆ", "แก้ไขข้อมูลเองโดยพลการ"], answer: 1, section: 0 },
+        { question: "28. การไม่ให้ข้อมูลที่ถูกต้องและครบถ้วนกับลูกค้าส่งผลเสียอย่างไร?", options: ["ลูกค้าอาจทำประกันที่ไม่ตรงกับความต้องการ", "ลูกค้าอาจยกเลิกกรมธรรม์", "บริษัทอาจไม่รับประกัน", "ถูกทุกข้อ"], answer: 3, section: 0 },
+        { question: "29. หากตัวแทนต้องการแก้ไขข้อมูลในกรมธรรม์ให้ลูกค้า ควรทำอย่างไร?", options: ["แก้ไขเองได้เลย", "แจ้งบริษัทและให้ลูกค้าเซ็นรับทราบ", "ไม่ต้องทำอะไร", "แจ้งด้วยวาจา"], answer: 1, section: 0 },
+        { question: "30. ข้อใดคือหน้าที่หลักของตัวแทนที่พึงมีต่อผู้เอาประกันภัย?", options: ["ให้ข้อมูลผลิตภัณฑ์ที่ถูกต้อง", "สร้างยอดขายให้บริษัท", "ให้ของกำนัลแก่ลูกค้า", "ให้บริการลูกค้าหลังการขาย"], answer: 0, section: 0 },
+
+        // หมวดที่ 2: ความรู้ทั่วไปเกี่ยวกับการประกันชีวิต (คลัง 100 ข้อ)
+        { question: "31. สัญญาประกันชีวิตคือสัญญาอะไร?", options: ["สัญญาต่างตอบแทน", "สัญญายืมเงิน", "สัญญาจะซื้อจะขาย", "สัญญาจ้างทำของ"], answer: 0, section: 1 },
+        { question: "32. ใครคือ 'ผู้เอาประกันภัย'?", options: ["บุคคลที่ทำสัญญาและจ่ายเบี้ยประกัน", "บุคคลที่บริษัทจะจ่ายเงินให้เมื่อเกิดเหตุ", "บุคคลที่ชีวิตของตนเองเป็นหลักประกันตามสัญญา", "บุคคลที่ดูแลกรมธรรม์"], answer: 2, section: 1 },
+        { question: "33. 'เบี้ยประกันภัย' หมายถึงอะไร?", options: ["จำนวนเงินที่บริษัทประกันจ่ายให้", "จำนวนเงินที่ผู้เอาประกันจ่ายให้บริษัท", "จำนวนเงินที่รัฐบาลกำหนด", "จำนวนเงินที่ใช้ในการบริหารจัดการ"], answer: 1, section: 1 },
+        { question: "34. ข้อใดคือหลักการพื้นฐานของการประกันชีวิต?", options: ["หลักการเงินทุน", "หลักเฉลี่ยภัย", "หลักการตลาด", "หลักเศรษฐศาสตร์"], answer: 1, section: 1 },
+        { question: "35. ข้อใดคือคุณสมบัติของ 'ผู้รับประโยชน์'?", options: ["ต้องเป็นญาติสายตรงเท่านั้น", "ต้องเป็นผู้ที่มีส่วนได้เสียในชีวิตของผู้เอาประกันภัย", "ต้องเป็นผู้ที่บรรลุนิติภาวะแล้ว", "ไม่มีคุณสมบัติกำหนด"], answer: 2, section: 1 },
+        { question: "36. บริษัทประกันชีวิตต้องได้รับอนุญาตจากใครจึงจะประกอบธุรกิจได้?", options: ["กระทรวงพาณิชย์", "กระทรวงการคลัง", "สำนักงาน คปภ.", "ธนาคารแห่งประเทศไทย"], answer: 2, section: 1 },
+        { question: "37. ข้อใดคือวัตถุประสงค์ของการประกันชีวิต?", options: ["การลงทุน", "การออมทรัพย์", "การคุ้มครองความเสี่ยง", "ถูกทุกข้อ"], answer: 3, section: 1 },
+        { question: "38. กรมธรรม์ประกันชีวิตแบบใดที่ให้ความคุ้มครองตลอดชีวิตของผู้เอาประกันภัย?", options: ["แบบตลอดชีพ", "แบบชั่วระยะเวลา", "แบบสะสมทรัพย์", "แบบบำนาญ"], answer: 0, section: 1 },
+        { question: "39. หากผู้เอาประกันภัยเสียชีวิตภายใน 2 ปี นับแต่วันทำสัญญา บริษัทอาจปฏิเสธความรับผิดได้หากสาเหตุการเสียชีวิตมาจากสิ่งใด?", options: ["อุบัติเหตุ", "ฆ่าตัวตาย", "โรคภัยไข้เจ็บ", "สงคราม"], answer: 1, section: 1 },
+        { question: "40. 'มูลค่าเงินสด' ของกรมธรรม์ หมายถึงอะไร?", options: ["เบี้ยประกันภัยที่จ่ายไปทั้งหมด", "จำนวนเงินที่บริษัทจะจ่ายคืนเมื่อเวนคืนกรมธรรม์", "จำนวนเงินที่บริษัทจ่ายเมื่อเสียชีวิต", "จำนวนเงินที่ใช้ในการลงทุน"], answer: 1, section: 1 },
+        { question: "41. ข้อใดคือบทบาทของ 'สำนักงาน คปภ.'?", options: ["ขายผลิตภัณฑ์ประกันภัย", "กำกับและส่งเสริมธุรกิจประกันภัย", "ให้คำปรึกษาด้านการลงทุน", "จัดทำกฎหมายประกันภัยทั้งหมด"], answer: 1, section: 1 },
+        { question: "42. กรมธรรม์ประกันชีวิตแบบใดที่มีลักษณะเป็นการออมทรัพย์เป็นหลัก?", options: ["แบบตลอดชีพ", "แบบสะสมทรัพย์", "แบบชั่วระยะเวลา", "แบบบำนาญ"], answer: 1, section: 1 },
+        { question: "43. 'ส่วนได้เสียในชีวิต' ของผู้เอาประกันภัย หมายถึงข้อใด?", options: ["ความสัมพันธ์ทางเครือญาติ", "ผลประโยชน์ทางการเงินหรือความผูกพันทางใจ", "สถานะทางการศึกษา", "สถานะทางสังคม"], answer: 1, section: 1 },
+        { question: "44. ข้อใดคือหน้าที่ของ 'ผู้เอาประกันภัย'?", options: ["จ่ายเบี้ยประกันภัย", "รับค่าสินไหมทดแทน", "ออกกรมธรรม์", "กำกับดูแลบริษัทประกัน"], answer: 0, section: 1 },
+        { question: "45. หากผู้เอาประกันภัยขาดส่งเบี้ยประกันภัย บริษัทจะดำเนินการอย่างไร?", options: ["ยกเลิกกรมธรรม์ทันที", "ส่งจดหมายเตือน", "ให้กรมธรรม์มีผลบังคับต่อไป 30 วัน", "ให้กรมธรรม์ขาดอายุ"], answer: 2, section: 1 },
+        { question: "46. กรมธรรม์ประกันชีวิตแบบ 'ยูนิต ลิงค์' (Unit Linked) มีลักษณะอย่างไร?", options: ["เน้นความคุ้มครองอย่างเดียว", "เน้นการออมทรัพย์อย่างเดียว", "เน้นการลงทุนอย่างเดียว", "รวมทั้งการออมและการลงทุน"], answer: 3, section: 1 },
+        { question: "47. ข้อใดคือความคุ้มครองที่ลูกค้าจะได้รับจาก 'กรมธรรม์ประกันชีวิตแบบชั่วระยะเวลา'?", options: ["คุ้มครองถึงอายุ 100 ปี", "คุ้มครองตามระยะเวลาที่กำหนดในสัญญา", "คุ้มครองเฉพาะช่วงวัยเกษียณ", "คุ้มครองจนเสียชีวิต"], answer: 1, section: 1 },
+        { question: "48. 'การแถลงข้อความจริง' ในใบคำขอเอาประกันภัย มีความสำคัญอย่างไร?", options: ["ไม่มีความสำคัญ", "ใช้เป็นข้อมูลในการพิจารณารับประกันภัย", "ใช้เป็นหลักฐานในการฟ้องร้อง", "ใช้เป็นเอกสารทางราชการ"], answer: 1, section: 1 },
+        { question: "49. ข้อใดคือประโยชน์ของ 'กรมธรรม์ประกันชีวิตแบบตลอดชีพ'?", options: ["เบี้ยประกันภัยถูกที่สุด", "คุ้มครองยาวนานตลอดชีวิต", "เน้นการออมในระยะสั้น", "ไม่มีการคืนเงินใดๆ"], answer: 1, section: 1 },
+        { question: "50. หากผู้เอาประกันภัยต้องการเปลี่ยนแปลง 'ผู้รับประโยชน์' ต้องทำอย่างไร?", options: ["แจ้งด้วยวาจา", "แจ้งเป็นลายลักษณ์อักษรไปยังบริษัท", "ไม่ต้องแจ้ง", "แจ้งทางโทรศัพท์"], answer: 1, section: 1 },
+        //... เพิ่มคำถามหมวดความรู้ทั่วไปอีก 75 ข้อ (ตัวอย่าง)
+        { question: "51. 'ค่าสินไหมทดแทน' หมายถึงอะไร?", options: ["เงินที่บริษัทประกันจ่ายให้ผู้เอาประกันภัยเมื่อเกิดเหตุ", "เงินที่ผู้เอาประกันจ่ายให้บริษัท", "เงินที่รัฐบาลให้ช่วยเหลือ", "เงินที่ใช้ในการลงทุน"], answer: 0, section: 1 },
+        { question: "52. กรมธรรม์ประกันชีวิตแบบใดที่ให้ความคุ้มครองพร้อมกับการออมทรัพย์", options: ["แบบตลอดชีพ", "แบบชั่วระยะเวลา", "แบบสะสมทรัพย์", "แบบยูนิต ลิงค์"], answer: 2, section: 1 },
+        { question: "53. การจ่ายเงินบำนาญจะเริ่มจ่ายเมื่อใด?", options: ["เมื่อเสียชีวิต", "เมื่อประสบอุบัติเหตุ", "เมื่อถึงวัยเกษียณตามที่กำหนดในสัญญา", "เมื่อครบกำหนดสัญญา"], answer: 2, section: 1 },
+        { question: "54. 'ความสามารถในการจ่ายเบี้ย' ของลูกค้ามีผลต่อการเลือกซื้อผลิตภัณฑ์ประกันภัยอย่างไร?", options: ["ไม่มีผล", "ควรเลือกแบบที่มีเบี้ยสูงสุด", "ควรเลือกแบบที่เหมาะสมกับฐานะทางการเงิน", "ควรเลือกแบบที่มีระยะเวลาสั้นที่สุด"], answer: 2, section: 1 },
+        { question: "55. ข้อใดคือลักษณะสำคัญของ 'การเวนคืนกรมธรรม์'?", options: ["เป็นการขอยกเลิกสัญญาก่อนครบกำหนด", "เป็นการขอรับเงินกู้", "เป็นการเปลี่ยนผู้รับประโยชน์", "เป็นการเพิ่มความคุ้มครอง"], answer: 0, section: 1 },
+        { question: "56. ในสัญญาประกันชีวิต ใครคือ 'ผู้รับประกัน'?", options: ["ตัวแทน", "ผู้เอาประกันภัย", "บริษัทประกัน", "ผู้รับประโยชน์"], answer: 2, section: 1 },
+        { question: "57. วัตถุประสงค์ของการประกันชีวิตคือเพื่ออะไร?", options: ["เพื่อการลงทุนและสร้างผลกำไร", "เพื่อถ่ายโอนความเสี่ยงทางการเงิน", "เพื่อเพิ่มโอกาสในการทำงาน", "เพื่อสร้างสังคมที่น่าอยู่"], answer: 1, section: 1 },
+        { question: "58. ข้อใดคือความแตกต่างระหว่าง 'ผู้เอาประกันภัย' กับ 'ผู้รับประโยชน์'?", options: ["เป็นบุคคลเดียวกันเสมอ", "ผู้เอาประกันภัยคือผู้จ่ายเบี้ย ส่วนผู้รับประโยชน์คือผู้รับเงิน", "ผู้เอาประกันภัยคือผู้รับเงิน ส่วนผู้รับประโยชน์คือผู้จ่ายเบี้ย", "เป็นญาติกันเสมอ"], answer: 1, section: 1 },
+        { question: "59. หากผู้เอาประกันภัยเสียชีวิต บริษัทต้องจ่ายเงินผลประโยชน์กรณีเสียชีวิตให้แก่ใคร?", options: ["ตัวแทน", "ทายาทโดยธรรม", "ผู้รับประโยชน์", "กระทรวงการคลัง"], answer: 2, section: 1 },
+        { question: "60. การทำประกันชีวิตให้บุคคลอื่นที่ไม่ใช่ตนเองต้องได้รับความยินยอมจากใคร?", options: ["ผู้เอาประกันภัย", "ผู้รับประโยชน์", "บริษัทประกัน", "กระทรวงการคลัง"], answer: 0, section: 1 },
+
+        // หมวดที่ 3: ประมวลกฎหมายแพ่งและพาณิชย์ (คลัง 50 ข้อ)
+        { question: "131. 'กรมธรรม์ประกันภัย' คือเอกสารประเภทใด?", options: ["สัญญายืมเงิน", "สัญญาที่ทำเป็นหนังสือ", "เอกสารการเงิน", "สัญญาที่ทำด้วยวาจา"], answer: 1, section: 2 },
+        { question: "132. บริษัทประกันต้องจ่ายเงินค่าสินไหมทดแทนให้แก่ผู้รับประโยชน์เมื่อใด?", options: ["ภายใน 7 วันหลังเสียชีวิต", "เมื่อได้รับเอกสารและหลักฐานครบถ้วนภายใน 15 วัน", "ทันทีเมื่อทราบว่าผู้เอาประกันเสียชีวิต", "ภายใน 30 วันหลังเสียชีวิต"], answer: 1, section: 2 },
+        { question: "133. 'อายุผู้เอาประกันภัยที่รับประกัน' หมายถึงอะไร?", options: ["อายุตามวันเกิด", "อายุตามปีที่เกิด", "อายุตามกฎหมาย", "อายุตามตารางมรณะ"], answer: 0, section: 2 },
+        { question: "134. 'ความสมบูรณ์ของสัญญา' มีผลตั้งแต่เมื่อใด?", options: ["เมื่อผู้เอาประกันภัยจ่ายเบี้ยประกันงวดแรก", "เมื่อบริษัทอนุมัติและออกกรมธรรม์", "เมื่อตัวแทนส่งมอบกรมธรรม์ให้ลูกค้า", "เมื่อลูกค้าเซ็นรับทราบ"], answer: 1, section: 2 },
+        { question: "135. หากผู้เอาประกันภัยไม่ได้แจ้งข้อความจริงเกี่ยวกับสุขภาพในใบคำขอ บริษัทมีสิทธิบอกล้างสัญญาภายในกี่ปี?", options: ["1 ปี", "2 ปี", "3 ปี", "5 ปี"], answer: 1, section: 2 },
+        { question: "136. ผู้เอาประกันภัยต้องแจ้งข้อความตามความจริงในสัญญาประกันชีวิตตามหลักการใด?", options: ["หลักสุจริตอย่างยิ่ง (Utmost Good Faith)", "หลักผู้บริโภค", "หลักกฎหมาย", "หลักตลาด"], answer: 0, section: 2 },
+        { question: "137. หากกรมธรรม์ขาดอายุ ผู้เอาประกันภัยสามารถขอต่ออายุกรมธรรม์ได้ภายในกี่ปีนับจากวันที่กรมธรรม์ขาดอายุ?", options: ["1 ปี", "3 ปี", "5 ปี", "ไม่มีกำหนด"], answer: 2, section: 2 },
+        { question: "138. 'การชำระเบี้ยประกันภัย' สามารถทำได้ด้วยวิธีใดบ้าง?", options: ["ชำระเป็นเงินสด", "ชำระผ่านธนาคาร", "ชำระผ่านตัวแทน", "ถูกทุกข้อ"], answer: 3, section: 2 },
+        { question: "139. หากผู้เอาประกันภัยเสียชีวิตโดยที่ผู้รับประโยชน์ไม่ได้ทำหน้าที่รับเงิน บริษัทจะจ่ายเงินสินไหมทดแทนให้ใคร?", options: ["ทายาทโดยธรรม", "เพื่อนสนิท", "ญาติ", "รัฐบาล"], answer: 0, section: 2 },
+        { question: "140. 'ระยะเวลาผ่อนผันการชำระเบี้ยประกันภัย' มีกี่วันนับจากวันครบกำหนดชำระ?", options: ["15 วัน", "30 วัน", "45 วัน", "60 วัน"], answer: 1, section: 2 },
+        { question: "141. หากผู้เอาประกันภัยแจ้งให้บริษัทแก้ไข 'ผู้รับประโยชน์' ในกรมธรรม์ แต่ยังไม่ได้แก้ไขและผู้เอาประกันเสียชีวิต บริษัทจะจ่ายเงินให้ใคร?", options: ["ผู้รับประโยชน์เดิม", "ทายาทโดยธรรม", "ผู้รับประโยชน์ใหม่ที่แจ้งไว้", "ต้องให้ศาลตัดสิน"], answer: 0, section: 2 },
+        { question: "142. กรมธรรม์จะสิ้นสุดลงเมื่อใด?", options: ["เมื่อผู้เอาประกันภัยเสียชีวิต", "เมื่อครบกำหนดสัญญา", "เมื่อมีการเวนคืน", "ถูกทุกข้อ"], answer: 3, section: 2 },
+        { question: "143. การที่บริษัทปฏิเสธการรับประกันภัยต้องทำอย่างไร?", options: ["แจ้งด้วยวาจา", "ไม่ต้องแจ้ง", "แจ้งเป็นลายลักษณ์อักษร", "แจ้งผ่านตัวแทน"], answer: 2, section: 2 },
+        { question: "144. หากผู้เอาประกันภัยต้องการกู้เงินจากมูลค่ากรมธรรม์ ต้องมีการชำระเบี้ยประกันภัยมาแล้วไม่น้อยกว่ากี่ปี?", options: ["1 ปี", "2 ปี", "3 ปี", "5 ปี"], answer: 2, section: 2 },
+        { question: "145. ข้อใดคือสิทธิของ 'ผู้เอาประกันภัย'?", options: ["สิทธิในการขอแก้ไขกรมธรรม์", "สิทธิในการเวนคืนกรมธรรม์", "สิทธิในการขอรับเงินกู้", "ถูกทุกข้อ"], answer: 3, section: 2 },
+        { question: "146. การบอกเลิกสัญญาประกันชีวิตโดยบริษัทจะทำได้เมื่อใด?", options: ["ผู้เอาประกันภัยไม่แจ้งความจริง", "ผู้เอาประกันภัยเสียชีวิต", "เมื่อมีเหตุสุดวิสัย", "เมื่อครบกำหนดสัญญา"], answer: 0, section: 2 },
+        { question: "147. ผู้รับประโยชน์ในกรมธรรม์ประกันชีวิตมีกี่คน?", options: ["1 คน", "ไม่เกิน 2 คน", "ไม่เกิน 5 คน", "กี่คนก็ได้"], answer: 3, section: 2 },
+        { question: "148. หากผู้เอาประกันภัยแถลงอายุคลาดเคลื่อนเกินกว่ากี่ปี บริษัทมีสิทธิบอกล้างสัญญา?", options: ["3 ปี", "4 ปี", "5 ปี", "ไม่มีกำหนด"], answer: 0, section: 2 },
+        { question: "149. เมื่อตัวแทนได้รับเบี้ยประกันภัยจากผู้เอาประกันภัย ถือว่าเบี้ยประกันภัยนั้นเป็นของใคร?", options: ["ของตัวแทน", "ของบริษัท", "ของผู้เอาประกันภัย", "ของ คปภ."], answer: 1, section: 2 },
+        { question: "150. 'หลักทรัพย์ค้ำประกัน' ที่บริษัทประกันต้องวางไว้กับนายทะเบียน มีวัตถุประสงค์เพื่ออะไร?", options: ["เพื่อการลงทุนของบริษัท", "เพื่อสร้างความน่าเชื่อถือ", "เพื่อสำรองจ่ายในกรณีที่บริษัทประสบปัญหาทางการเงิน", "เพื่อเป็นค่าใช้จ่ายในการบริหาร"], answer: 2, section: 2 },
+        //... เพิ่มคำถามหมวดกฎหมายอีก 30 ข้อ (ตัวอย่าง)
+        { question: "151. สัญญาประกันชีวิตจะสมบูรณ์เมื่อใด?", options: ["เมื่อผู้เอาประกันภัยชำระเบี้ยประกันงวดแรก", "เมื่อผู้รับประกันภัยออกกรมธรรม์", "เมื่อตัวแทนส่งมอบกรมธรรม์", "เมื่อผู้เอาประกันภัยเซ็นชื่อรับทราบ"], answer: 1, section: 2 },
+        { question: "152. หากผู้เอาประกันภัยเสียชีวิตเนื่องจากการกระทำความผิดของตนเอง บริษัทจะจ่ายเงินหรือไม่?", options: ["ไม่จ่าย", "จ่ายเต็มจำนวน", "จ่ายครึ่งหนึ่ง", "จ่ายตามดุลยพินิจ"], answer: 0, section: 2 },
+        { question: "153. การแถลงข้อมูลเท็จของผู้เอาประกันภัยจะทำให้บริษัทบอกล้างสัญญาได้ภายในกี่ปี?", options: ["ภายใน 1 ปี", "ภายใน 2 ปี", "ภายใน 5 ปี", "ไม่มีกำหนด"], answer: 1, section: 2 },
+        { question: "154. ผู้รับประโยชน์ในสัญญาประกันชีวิตต้องมี 'ส่วนได้เสียในชีวิต' ของผู้เอาประกันภัยหรือไม่?", options: ["ต้องมีเสมอ", "ไม่ต้องมีก็ได้", "แล้วแต่กรณี", "ขึ้นอยู่กับกฎหมาย"], answer: 1, section: 2 },
+        { question: "155. หากบริษัทต้องการบอกเลิกสัญญากับผู้เอาประกันภัย ต้องทำอย่างไร?", options: ["แจ้งด้วยวาจา", "แจ้งเป็นหนังสือ", "ไม่ต้องแจ้ง", "แจ้งผ่านตัวแทน"], answer: 1, section: 2 },
+        { question: "156. เมื่อเกิดเหตุที่ต้องจ่ายเงินสินไหมทดแทน บริษัทต้องชำระเงินให้แก่ผู้รับประโยชน์ภายในกี่วันนับแต่วันที่ได้รับหลักฐานครบถ้วน?", options: ["ภายใน 7 วัน", "ภายใน 15 วัน", "ภายใน 30 วัน", "ภายใน 60 วัน"], answer: 1, section: 2 },
+        { question: "157. สิทธิเรียกร้องตามสัญญาประกันชีวิตจะมีอายุความกี่ปี?", options: ["1 ปี", "2 ปี", "5 ปี", "10 ปี"], answer: 4, section: 2 },
+        { question: "158. หากผู้เอาประกันภัยทำการปลอมแปลงเอกสาร บริษัทมีสิทธิบอกเลิกสัญญาภายในกี่ปี?", options: ["1 ปี", "2 ปี", "3 ปี", "5 ปี"], answer: 2, section: 2 },
+        { question: "159. กฎหมายประกันชีวิตกำหนดให้ตัวแทนต้องส่งเบี้ยประกันให้บริษัทภายในกี่วันทำการ?", options: ["ภายใน 3 วัน", "ภายใน 7 วัน", "ภายใน 15 วัน", "ภายใน 30 วัน"], answer: 1, section: 2 },
+        { question: "160. ข้อใดคือโทษทางอาญาที่ตัวแทนอาจได้รับจากการกระทำผิดกฎหมาย?", options: ["จำคุก", "ปรับ", "เพิกถอนใบอนุญาต", "ถูกทุกข้อ"], answer: 3, section: 2 },
+    ];
+
+    let examMode;
+    let currentSection = 0;
+    let currentQuestionIndex = 0;
+    
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    const shuffledQuestions = [];
+    const sectionCounts = [15, 25, 20];
+
+    function generateQuiz() {
+        const sections = questionBank.reduce((acc, q) => {
+            acc[q.section] = acc[q.section] || [];
+            acc[q.section].push(q);
+            return acc;
+        }, {});
+        
+        shuffledQuestions.length = 0;
+        let questionNumber = 1;
+
+        for (let i = 0; i < sectionCounts.length; i++) {
+            const sectionQuestions = sections[i];
+            shuffleArray(sectionQuestions);
+            const selectedQuestions = sectionQuestions.slice(0, sectionCounts[i]);
+
+            selectedQuestions.forEach(q => {
+                const newQuestion = {...q};
+                newQuestion.question = `${questionNumber}. ${newQuestion.question.split('.').slice(1).join('.')}`;
+                shuffledQuestions.push(newQuestion);
+                questionNumber++;
+            });
+        }
+    }
+
+    const startPage = document.getElementById('start-page');
+    const quizPage = document.getElementById('quiz-page');
+    const quizForm = document.getElementById('quizForm');
+    const questionNav = document.getElementById('question-nav');
+    const timerContainer = document.querySelector('.timer-container');
+    const timerDisplay = document.getElementById('timer');
+    const nextButton = document.getElementById('next-button');
+    const prevButton = document.getElementById('prev-button');
+    let timeLeft = 120 * 60; // 120 นาทีเป็นวินาที
+    let timerInterval;
+    
+    // Counter for misconducts
+    let misconductCounter = 0;
+    const maxMisconducts = 3;
+
+    function startQuiz() {
+        const selectedMode = document.querySelector('input[name="exam_mode"]:checked');
+        if (!selectedMode) {
+            alert("กรุณาเลือกรูปแบบการสอบก่อนเริ่ม");
+            return;
+        }
+        examMode = selectedMode.value;
+
+        startPage.style.display = 'none';
+        quizPage.style.display = 'block';
+        createQuiz();
+        enableMisconductDetection();
+    }
+
+    function enableMisconductDetection() {
+        window.addEventListener('contextmenu', e => {
+            e.preventDefault();
+            alertMisconduct();
+        });
+        window.addEventListener('keydown', e => {
+            // Allow Ctrl+C, Ctrl+V, etc. but block most keys
+            if (!(e.ctrlKey || e.metaKey || e.key === 'Shift')) {
+                 // Check if the key is a special one
+                if (e.key.length === 1 || e.key === 'F12' || e.key === 'Tab') {
+                    e.preventDefault();
+                    alertMisconduct();
+                }
+            }
+        });
+        window.addEventListener('blur', e => {
+            alertMisconduct('คุณกำลังเปิดโปรแกรมอื่นในระหว่างการสอบ');
+        });
+    }
+
+    function alertMisconduct(message = 'ระบบตรวจพบการกระทำต้องห้าม!') {
+        misconductCounter++;
+        alert(`${message}\n\nคำเตือนครั้งที่ ${misconductCounter}/${maxMisconducts}\nหากตรวจพบเกินกว่าที่กำหนด จะถือว่าทุจริตและสอบไม่ผ่านทันที`);
+        if (misconductCounter >= maxMisconducts) {
+            alert('คุณทุจริตการสอบ ระบบจะปรับให้สอบไม่ผ่านทันที');
+            submitQuiz(true); // Force fail
+        }
+    }
+
+    function createQuiz() {
+        generateQuiz();
+        quizForm.innerHTML = '';
+        shuffledQuestions.forEach((q, index) => {
+            const questionElement = document.createElement('div');
+            questionElement.classList.add('question');
+            questionElement.setAttribute('data-index', index);
+            questionElement.setAttribute('data-section', q.section);
+            questionElement.style.display = 'none';
+
+            let html = `<h3>${q.question}</h3><div class="options">`;
+            q.options.forEach((option, i) => {
+                const questionName = `q${index}`;
+                const optionId = `q${index}o${i}`;
+                html += `<input type="radio" id="${optionId}" name="${questionName}" value="${i}" onclick="checkAnswer(${index}, ${i})">
+                         <label for="${optionId}">${option}</label><br>`;
+            });
+            html += `</div>`;
+            questionElement.innerHTML = html;
+            quizForm.appendChild(questionElement);
+        });
+
+        if (examMode === 'timed') {
+            timerContainer.style.display = 'block';
+            startTimer();
+        } else {
+            timerContainer.style.display = 'none';
+        }
+        
+        if (examMode === 'step_by_step') {
+            document.getElementById('submit-button').style.display = 'none';
+        } else {
+            document.getElementById('submit-button').style.display = 'block';
+        }
+
+        showSection(0);
+    }
+    
+    function showSection(sectionIndex) {
+        currentSection = sectionIndex;
+        const sectionNavButtons = document.querySelectorAll('.section-nav button');
+        const firstQuestionInSection = shuffledQuestions.findIndex(q => q.section === sectionIndex);
+        
+        sectionNavButtons.forEach((btn, index) => {
+            btn.classList.toggle('active', index === sectionIndex);
+        });
+        
+        questionNav.innerHTML = '';
+        shuffledQuestions.filter(q => q.section === sectionIndex).forEach((q, index) => {
+            const navButton = document.createElement('button');
+            navButton.textContent = q.question.split('.')[0];
+            navButton.onclick = () => showQuestion(firstQuestionInSection + index);
+            questionNav.appendChild(navButton);
+        });
+        
+        showQuestion(firstQuestionInSection);
+    }
+
+    function showQuestion(index) {
+        const questions = document.querySelectorAll('.question');
+        questions.forEach(q => q.style.display = 'none');
+        questions[index].style.display = 'block';
+        currentQuestionIndex = index;
+        updateNavButtons();
+    }
+    
+    function updateNavButtons() {
+        const navButtons = document.querySelectorAll('.question-nav button');
+        navButtons.forEach((btn, index) => {
+            btn.classList.remove('current');
+            const sectionStartIndex = shuffledQuestions.findIndex(q => q.section === currentSection);
+            if (index + sectionStartIndex === currentQuestionIndex) {
+                btn.classList.add('current');
+            }
+        });
+        
+        prevButton.style.display = currentQuestionIndex > 0 ? 'inline-block' : 'none';
+        nextButton.style.display = currentQuestionIndex < shuffledQuestions.length - 1 ? 'inline-block' : 'none';
+
+        if (examMode === 'step_by_step') {
+            nextButton.textContent = 'ข้อถัดไป';
+            const selectedOption = document.querySelector(`input[name="q${currentQuestionIndex}"]:checked`);
+            if (selectedOption) {
+                nextButton.disabled = false;
+            } else {
+                nextButton.disabled = true;
+            }
+        }
+    }
+
+    nextButton.addEventListener('click', () => {
+        if (examMode === 'step_by_step') {
+            // Move to next question after showing answer
+            if (currentQuestionIndex < shuffledQuestions.length - 1) {
+                showQuestion(currentQuestionIndex + 1);
+            }
+        } else {
+            if (currentQuestionIndex < shuffledQuestions.length - 1) {
+                showQuestion(currentQuestionIndex + 1);
+            }
+        }
+    });
+
+    prevButton.addEventListener('click', () => {
+        if (currentQuestionIndex > 0) {
+            showQuestion(currentQuestionIndex - 1);
+        }
+    });
+    
+    function checkAnswer(questionIndex, selectedOptionIndex) {
+        if (examMode === 'step_by_step') {
+            const question = shuffledQuestions[questionIndex];
+            const isCorrect = (selectedOptionIndex === question.answer);
+            const questionElement = document.querySelector(`.question[data-index="${questionIndex}"]`);
+            
+            const options = questionElement.querySelectorAll('input[type="radio"]');
+            options.forEach(option => option.disabled = true);
+            
+            const labels = questionElement.querySelectorAll('label');
+            labels.forEach(label => {
+                if (parseInt(label.previousElementSibling.value) === question.answer) {
+                    label.style.backgroundColor = '#d4edda';
+                    label.style.borderColor = '#c3e6cb';
+                    label.style.color = '#155724';
+                }
+                if (parseInt(label.previousElementSibling.value) === selectedOptionIndex && !isCorrect) {
+                     label.style.backgroundColor = '#f8d7da';
+                     label.style.borderColor = '#f5c6cb';
+                     label.style.color = '#721c24';
+                }
+            });
+            
+            // Enable next button for step-by-step mode
+            nextButton.disabled = false;
+        }
+    }
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                alert("หมดเวลาทำข้อสอบแล้ว!");
+                submitQuiz();
+                return;
+            }
+            timeLeft--;
+            const hours = Math.floor(timeLeft / 3600);
+            const minutes = Math.floor((timeLeft % 3600) / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }, 1000);
+    }
+    
+    function submitQuiz(isCheating = false) {
+        clearInterval(timerInterval);
+        let score = 0;
+        const answers = {};
+        shuffledQuestions.forEach((q, index) => {
+            const questionName = `q${index}`;
+            const selectedAnswer = document.querySelector(`input[name="${questionName}"]:checked`);
+            if (selectedAnswer) {
+                answers[questionName] = selectedAnswer.value;
+            }
+        });
+
+        if (isCheating) {
+            score = 0; // Force score to 0 if cheating is detected
+        } else {
+            for (let i = 0; i < shuffledQuestions.length; i++) {
+                const questionName = `q${i}`;
+                if (answers[questionName] && parseInt(answers[questionName]) === shuffledQuestions[i].answer) {
+                    score++;
+                }
+            }
+        }
+        
+        const passScore = 42;
+        const resultDiv = document.getElementById('result');
+        let resultText = `คุณได้คะแนน ${score} จาก ${shuffledQuestions.length} คะแนน<br>`;
+        if (isCheating) {
+             resultText = `<span style="color: #d9534f; font-weight: bold;">เนื่องจากตรวจพบการทุจริต จึงปรับให้สอบไม่ผ่าน</span><br><br>คะแนนของคุณคือ 0 คะแนน`;
+        } else if (score >= passScore) {
+            resultText += `<span style="color: #28a745;">ยินดีด้วย! คุณผ่านเกณฑ์แล้ว</span>`;
+        } else {
+            resultText += `<span style="color: #d9534f;">เสียใจด้วย คุณไม่ผ่านเกณฑ์</span>`;
+        }
+        resultDiv.innerHTML = resultText;
+        resultDiv.style.display = 'block';
+        
+        quizForm.querySelectorAll('input, button').forEach(el => el.disabled = true);
+        document.getElementById('submit-button').style.display = 'none';
+        document.getElementById('prev-button').style.display = 'none';
+        document.getElementById('next-button').style.display = 'none';
+        
+        const sectionNavButtons = document.querySelectorAll('.section-nav button');
+        sectionNavButtons.forEach(btn => btn.disabled = true);
+        
+        const questionNavButtons = document.querySelectorAll('.question-nav button');
+        questionNavButtons.forEach(btn => btn.disabled = true);
+
+        showAnswerKey(answers);
+    }
+    
+    function showAnswerKey(userAnswers) {
+        const answerKeyDiv = document.getElementById('answer-key');
+        answerKeyDiv.innerHTML = '<h2>เฉลยคำตอบ</h2>';
+        shuffledQuestions.forEach((q, index) => {
+            const answerItem = document.createElement('div');
+            answerItem.classList.add('answer-item');
+            
+            const questionText = document.createElement('div');
+            questionText.classList.add('question-text');
+            questionText.textContent = q.question;
+            
+            const correctAnswer = document.createElement('div');
+            correctAnswer.classList.add('correct-answer');
+            correctAnswer.textContent = `เฉลย: ${q.options[q.answer]}`;
+            
+            answerItem.appendChild(questionText);
+            answerItem.appendChild(correctAnswer);
+            
+            const userAnswer = userAnswers[`q${index}`];
+            if (userAnswer !== undefined) {
+                const userAnswerText = document.createElement('div');
+                userAnswerText.classList.add('user-answer');
+                userAnswerText.textContent = `คำตอบของคุณ: ${q.options[userAnswer]}`;
+                if (parseInt(userAnswer) === q.answer) {
+                    userAnswerText.style.color = '#28a745';
+                }
+                answerItem.appendChild(userAnswerText);
+            }
+            
+            answerKeyDiv.appendChild(answerItem);
+        });
+        answerKeyDiv.style.display = 'block';
+    }
+
+
+    let display = document.getElementById('calc-display');
+    let calculator = document.getElementById('calculator');
+    let currentInput = '0';
+    let operator = null;
+    let firstOperand = null;
+    let waitingForSecondOperand = false;
+
+    function toggleCalculator() {
+        if (calculator.style.display === 'none' || calculator.style.display === '') {
+            calculator.style.display = 'block';
+        } else {
+            calculator.style.display = 'none';
+        }
+    }
+    function updateDisplay() { display.textContent = currentInput; }
+    function clearDisplay() { currentInput = '0'; operator = null; firstOperand = null; waitingForSecondOperand = false; updateDisplay(); }
+    function deleteLast() { currentInput = currentInput.slice(0, -1); if (currentInput === '') { currentInput = '0'; } updateDisplay(); }
+    function appendNumber(number) { if (waitingForSecondOperand) { currentInput = number; waitingForSecondOperand = false; } else { currentInput = currentInput === '0' ? number : currentInput + number; } updateDisplay(); }
+    function appendOperator(op) { const inputValue = parseFloat(currentInput); if (operator && waitingForSecondOperand) { operator = op; return; } if (firstOperand === null) { firstOperand = inputValue; } else if (operator) { const result = performCalculation(firstOperand, inputValue, operator); currentInput = String(result); firstOperand = result; } waitingForSecondOperand = true; operator = op; updateDisplay(); }
+    function calculateResult() { if (operator === null || waitingForSecondOperand) { return; } const secondOperand = parseFloat(currentInput); const result = performCalculation(firstOperand, secondOperand, operator); currentInput = String(result); firstOperand = result; operator = null; waitingForSecondOperand = true; updateDisplay(); }
+    function performCalculation(op1, op2, op) { if (op === '+') return op1 + op2; if (op === '-') return op1 - op2; if (op === '*') return op1 * op2; if (op === '/') return op1 / op2; if (op === '%') return op1 % op2; return op2; }
+    
+    //createQuiz(); // Removed initial call
+</script>
+
+</body>
+</html>
